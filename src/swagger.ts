@@ -18,6 +18,15 @@ const options: swaggerJsdoc.Options = {
         description: 'Production server',
       },
     ],
+    components: {
+      securitySchemes: {
+        ApiKeyAuth: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'x-api-key',
+        },
+      },
+    },
   },
   // Look for annotations in our route files
   apis: ['./src/routes/*.ts', './dist/routes/*.js'],
