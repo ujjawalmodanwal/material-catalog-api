@@ -14,7 +14,7 @@ A simple REST API for managing material data, built with TypeScript, Express, an
 ### Setup
 1. Clone the repo:
    ```bash
-   git clone [<repository-url>](https://github.com/ujjawalmodanwal/material-catalog-api)
+   git clone https://github.com/ujjawalmodanwal/material-catalog-api
    cd material-catalog-api
    ```
 2. Install dependencies:
