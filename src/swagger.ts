@@ -10,7 +10,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'https://material-catalog-api-backend.onrender.com',
+        url: 'http://localhost:3000',
       },
     ],
     components: {
