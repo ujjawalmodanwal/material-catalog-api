@@ -2,6 +2,10 @@
 
 A simple REST API for managing material data, built with TypeScript, Express, and Zod for validation.
 
+**Live Demo:** You can test the API at [https://material-catalog-api-backend.onrender.com](https://material-catalog-api-backend.onrender.com/api-docs)
+
+PS: This is free tier deployment. Instance will spin down with inactivity, which can delay requests by 50 seconds or more.
+
 ## Tech Stack
 *   TypeScript
 *   Node.js & Express

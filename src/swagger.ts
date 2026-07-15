@@ -1,0 +1,30 @@
+import swaggerJsdoc from 'swagger-jsdoc';
+
+const options: swaggerJsdoc.Options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Material Catalog API',
+      version: '1.0.0',
+      description: 'API for managing a material catalog',
+    },
+    servers: [
+      {
+        url: 'https://material-catalog-api-backend.onrender.com',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        ApiKeyAuth: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'x-api-key',
+        },
+      },
+    },
+  },
+  // Look for annotations in our route files
+  apis: ['./src/routes/*.ts'],
+};
+
+export const swaggerSpec = swaggerJsdoc(options);
