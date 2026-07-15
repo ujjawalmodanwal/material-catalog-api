@@ -20,7 +20,7 @@ const options: swaggerJsdoc.Options = {
     ],
   },
   // Look for annotations in our route files
-  apis: ['./src/routes/*.ts'],
+  apis: ['./src/routes/*.ts', './dist/routes/*.js'],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
