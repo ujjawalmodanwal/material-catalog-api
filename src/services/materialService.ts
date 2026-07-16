@@ -1,5 +1,6 @@
-import { Material } from '../models/material.js';
+import { Material, CreateMaterial } from '../models/material.js';
 import { materialRepository } from '../repositories/materialRepository.js';
+import { randomUUID } from 'crypto';
 
 export const materialService = {
   getAllMaterials: async (): Promise<Material[]> => {
@@ -10,10 +11,12 @@ export const materialService = {
     return await materialRepository.findById(id);
   },
 
-  createMaterial: async (material: Material): Promise<Material> => {
-    // TODO: add validation logic, e.g., uniqueness checks
+  createMaterial: async (data: CreateMaterial): Promise<Material> => {
+    const material: Material = {
+      ...data,
+      id: randomUUID(),
+    };
     return materialRepository.create(material);
-
   },
 
   updateMaterial: async (id: string, material: Material): Promise<Material | undefined> => {

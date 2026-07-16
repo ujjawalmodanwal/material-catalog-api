@@ -12,13 +12,17 @@ process.env.API_KEY = 'secret-key-123';
 
 describe('Material API', () => {
   const newMaterial = {
-    id: 'mat_001',
     name: 'Graphene',
     formula: 'C',
     properties: {
       molecularWeight: 12.011,
       isConductive: true,
     },
+  };
+  
+  const createdMaterial = {
+    ...newMaterial,
+    id: 'mat_001',
   };
 
   const validHeaders = { 'x-api-key': 'secret-key-123' };
@@ -35,5 +39,6 @@ describe('Material API', () => {
     // This will likely fail without a running Neo4j instance, 
     // but the test code is now structurally correct.
     expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('id');
   });
 });

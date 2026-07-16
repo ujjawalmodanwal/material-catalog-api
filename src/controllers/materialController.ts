@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { materialService } from '../services/materialService.js';
-import { MaterialSchema } from '../models/material.js';
+import { MaterialSchema, CreateMaterialSchema } from '../models/material.js';
 
 export const materialController = {
   create: async (req: Request, res: Response) => {
     try {
-      const validatedData = MaterialSchema.parse(req.body);
+      const validatedData = CreateMaterialSchema.parse(req.body);
       const newMaterial = await materialService.createMaterial(validatedData);
       res.status(201).json(newMaterial);
     } catch (error) {

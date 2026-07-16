@@ -10,5 +10,8 @@ export const MaterialSchema = z.object({
   }),
 });
 
+export const CreateMaterialSchema = MaterialSchema.omit({ id: true });
+
 export type Material = z.infer<typeof MaterialSchema>;
+export type CreateMaterial = z.infer<typeof CreateMaterialSchema>;
 
