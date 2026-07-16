@@ -57,8 +57,11 @@ export const materialRepository = {
         { id, name: material.name, formula: material.formula, properties: JSON.stringify(material.properties) }
       );
       if (result.records.length === 0) return undefined;
-      const properties = JSON.parse(result.records[0].get('m').properties);
-      return { ...result.records[0].get('m').properties, properties };
+      const node = result.records[0].get('m');
+      return {
+        ...node.properties,
+        properties: JSON.parse(node.properties.properties)
+      } as Material;
     } finally {
       await session.close();
     }

@@ -36,13 +36,17 @@ export const materialController = {
 
   update: async (req: Request, res: Response) => {
     try {
-      const validatedData = MaterialSchema.parse(req.body);
+      const validatedData = CreateMaterialSchema.parse(req.body);
       const id = typeof req.params.id === 'string' ? req.params.id : req.params.id[0];
-      const updatedMaterial = await materialService.updateMaterial(id, validatedData);
+      const materialToUpdate: Material = {
+        ...validatedData,
+        id,
+      };
+      const updatedMaterial = await materialService.updateMaterial(id, materialToUpdate);
       if (!updatedMaterial) {
         res.status(404).json({ error: 'Material not found' });
       } else {
-        res.json(updatedMaterial);
+        res.status(200).json(updatedMaterial);
       }
     } catch (error) {
       res.status(400).json({ error: 'Invalid data' });
