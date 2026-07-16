@@ -1,34 +1,64 @@
 import { Material } from '../models/material.js';
-
-// Temporary in-memory storage for demonstration purposes.
-// Replace with database implementation later.
-const materials: Material[] = [];
+import { driver } from '../config/neo4j.js';
 
 export const materialRepository = {
   findAll: async (): Promise<Material[]> => {
-    return materials;
+    const session = driver.session();
+    try {
+      const result = await session.run('MATCH (m:Material) RETURN m');
+      return result.records.map(record => record.get('m').properties as Material);
+    } finally {
+      await session.close();
+    }
   },
 
   findById: async (id: string): Promise<Material | undefined> => {
-    return materials.find((m) => m.id === id);
+    const session = driver.session();
+    try {
+      const result = await session.run('MATCH (m:Material {id: $id}) RETURN m', { id });
+      if (result.records.length === 0) return undefined;
+      return result.records[0].get('m').properties as Material;
+    } finally {
+      await session.close();
+    }
   },
 
   create: async (material: Material): Promise<Material> => {
-    materials.push(material);
-    return material;
+    const session = driver.session();
+    try {
+      await session.run('CREATE (m:Material {id: $id, name: $name, formula: $formula, properties: $properties})', {
+        id: material.id,
+        name: material.name,
+        formula: material.formula,
+        properties: material.properties
+      });
+      return material;
+    } finally {
+      await session.close();
+    }
   },
 
   update: async (id: string, material: Material): Promise<Material | undefined> => {
-    const index = materials.findIndex((m) => m.id === id);
-    if (index === -1) return undefined;
-    materials[index] = material;
-    return material;
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        'MATCH (m:Material {id: $id}) SET m.name = $name, m.formula = $formula, m.properties = $properties RETURN m',
+        { id, name: material.name, formula: material.formula, properties: material.properties }
+      );
+      if (result.records.length === 0) return undefined;
+      return result.records[0].get('m').properties as Material;
+    } finally {
+      await session.close();
+    }
   },
 
   delete: async (id: string): Promise<boolean> => {
-    const index = materials.findIndex((m) => m.id === id);
-    if (index === -1) return false;
-    materials.splice(index, 1);
-    return true;
+    const session = driver.session();
+    try {
+      const result = await session.run('MATCH (m:Material {id: $id}) DETACH DELETE m RETURN count(m) as deleted', { id });
+      return result.records[0].get('deleted').toNumber() > 0;
+    } finally {
+      await session.close();
+    }
   },
 };

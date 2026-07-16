@@ -13,7 +13,8 @@
     "moduleDetection": "force",
     "sourceMap": true,
     "declaration": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["jest"]
   },
   "include": ["src/**/*"],
   "ts-node": {
