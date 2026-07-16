@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { materialService } from '../services/materialService.js';
-import { MaterialSchema, CreateMaterialSchema } from '../models/material.js';
+import { Material, MaterialSchema, CreateMaterialSchema } from '../models/material.js';
 
 export const materialController = {
   create: async (req: Request, res: Response) => {
