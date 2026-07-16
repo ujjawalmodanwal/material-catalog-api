@@ -9,7 +9,13 @@ export const materialController = {
       const newMaterial = await materialService.createMaterial(validatedData);
       res.status(201).json(newMaterial);
     } catch (error) {
-      res.status(400).json({ error: 'Invalid data' });
+      if (error instanceof Error && 'issues' in error) {
+        console.error('Validation error details:', (error as any).issues);
+        res.status(400).json({ error: 'Invalid data', details: (error as any).issues });
+      } else {
+        console.error('Validation error:', error);
+        res.status(400).json({ error: 'Invalid data' });
+      }
     }
   },
 
