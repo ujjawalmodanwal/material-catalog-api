@@ -5,12 +5,16 @@ export const materialRepository = {
   findAll: async (): Promise<Material[]> => {
     const session = driver.session();
     try {
-      const result = await session.run('MATCH (m:Material) RETURN m');
+      const result = await session.run('MATCH (m:Material)-[:HAS_PROPERTIES]->(p:Property) RETURN m, p');
       return result.records.map(record => {
-        const node = record.get('m');
+        const m = record.get('m').properties;
+        const p = record.get('p').properties;
         return {
-          ...node.properties,
-          properties: JSON.parse(node.properties.properties)
+          ...m,
+          properties: {
+            molecularWeight: p.molecularWeight,
+            isConductive: p.isConductive
+          }
         } as Material;
       });
     } finally {
@@ -21,28 +25,37 @@ export const materialRepository = {
   findById: async (id: string): Promise<Material | undefined> => {
     const session = driver.session();
     try {
-      const result = await session.run('MATCH (m:Material {id: $id}) RETURN m', { id });
+      const result = await session.run('MATCH (m:Material {id: $id})-[:HAS_PROPERTIES]->(p:Property) RETURN m, p', { id });
       if (result.records.length === 0) return undefined;
-      const node = result.records[0].get('m');
+      const m = result.records[0].get('m').properties;
+      const p = result.records[0].get('p').properties;
       return {
-        ...node.properties,
-        properties: JSON.parse(node.properties.properties)
+        ...m,
+        properties: {
+          molecularWeight: p.molecularWeight,
+          isConductive: p.isConductive
+        }
       } as Material;
     } finally {
       await session.close();
     }
   },
 
-
   create: async (material: Material): Promise<Material> => {
     const session = driver.session();
     try {
-      await session.run('CREATE (m:Material {id: $id, name: $name, formula: $formula, properties: $properties})', {
-        id: material.id,
-        name: material.name,
-        formula: material.formula,
-        properties: JSON.stringify(material.properties)
-      });
+      await session.run(
+        `CREATE (m:Material {id: $id, name: $name, formula: $formula})
+         CREATE (p:Property {molecularWeight: $mw, isConductive: $ic})
+         CREATE (m)-[:HAS_PROPERTIES]->(p)`,
+        {
+          id: material.id,
+          name: material.name,
+          formula: material.formula,
+          mw: material.properties.molecularWeight,
+          ic: material.properties.isConductive
+        }
+      );
       return material;
     } finally {
       await session.close();
@@ -53,14 +66,26 @@ export const materialRepository = {
     const session = driver.session();
     try {
       const result = await session.run(
-        'MATCH (m:Material {id: $id}) SET m.name = $name, m.formula = $formula, m.properties = $properties RETURN m',
-        { id, name: material.name, formula: material.formula, properties: JSON.stringify(material.properties) }
+        `MATCH (m:Material {id: $id})-[:HAS_PROPERTIES]->(p:Property)
+         SET m.name = $name, m.formula = $formula, p.molecularWeight = $mw, p.isConductive = $ic
+         RETURN m, p`,
+        { 
+            id, 
+            name: material.name, 
+            formula: material.formula, 
+            mw: material.properties.molecularWeight, 
+            ic: material.properties.isConductive 
+        }
       );
       if (result.records.length === 0) return undefined;
-      const node = result.records[0].get('m');
+      const m = result.records[0].get('m').properties;
+      const p = result.records[0].get('p').properties;
       return {
-        ...node.properties,
-        properties: JSON.parse(node.properties.properties)
+        ...m,
+        properties: {
+          molecularWeight: p.molecularWeight,
+          isConductive: p.isConductive
+        }
       } as Material;
     } finally {
       await session.close();
@@ -70,7 +95,13 @@ export const materialRepository = {
   delete: async (id: string): Promise<boolean> => {
     const session = driver.session();
     try {
-      const result = await session.run('MATCH (m:Material {id: $id}) DETACH DELETE m RETURN count(m) as deleted', { id });
+      const result = await session.run(
+          `MATCH (m:Material {id: $id}) 
+           OPTIONAL MATCH (m)-[r:HAS_PROPERTIES]->(p:Property) 
+           DELETE r, p, m 
+           RETURN count(m) as deleted`, 
+          { id }
+      );
       return result.records[0].get('deleted').toNumber() > 0;
     } finally {
       await session.close();
