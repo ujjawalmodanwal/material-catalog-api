@@ -2,7 +2,9 @@
 
 A simple REST API for managing material data, built with TypeScript, Express, and Zod for validation.
 
-**Live Demo:** You can test the API at [https://material-catalog-api-backend.onrender.com](https://material-catalog-api-backend.onrender.com/api-docs)
+**Try Live Demo:** You can test the API at [https://material-catalog-api-backend.onrender.com/api-docs](https://material-catalog-api-backend.onrender.com/api-docs)
+**Frontend:** Swagger UI
+**Database**: Free instance Neo4j service
 
 PS: This is free tier deployment. Instance will spin down with inactivity, which can delay requests by 50 seconds or more.
 
@@ -37,5 +39,27 @@ Endpoints are served under `/api/materials`.
 
 ### Example
 ```bash
-curl -X GET http://localhost:3000/api/materials
+curl -X GET https://material-catalog-api-backend.onrender.com/api/materials
 ```
+## Data Model Architecture
+This API leverages **Neo4j**, a native graph database, to store material data. Instead of storing complex data as flat strings or JSON blobs, the model is designed to take full advantage of graph traversal and indexing.
+
+### The Graph Model
+The model separates the **Core Entity** (`:Material`) from its **Relational Attributes** (`:Property`). This allows for high-performance querying of specific material properties across the entire dataset graph LR
+M[:Material] -- "HAS_PROPERTIES" --> P[:Property]
+
+#### Entity Definitions
+| Node | Responsibilities | Key Properties |
+| :--- | :--- | :--- |
+| **`:Material`** | Represents the core entity | `id` (UUID), `name`, `formula` |
+| **`:Property`** | Represents modular material attributes | `molecularWeight`, `isConductive` |
+
+### Architectural Benefits
+
+**Native Graph Traversal:** By separating properties into linked nodes, the model enables blazing-fast graph traversals. Finding all materials that share a specific property attribute does not require scanning the entire database.
+
+**Scalability:** The schema is highly extensible. Adding new entity types—such as `:Supplier`, `:SafetyData`, or `:ManufacturingProcess`—requires only defining new nodes and relationships, avoiding the need to alter or bloat the core `:Material` node.
+
+**Indexing & Performance:** Promoting attributes like `isConductive` to direct properties on `:Property` nodes allows for native indexing in Neo4j, enabling efficient filtering and analytical queries that are impossible in document-based storage models.
+
+
