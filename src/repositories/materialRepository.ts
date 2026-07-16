@@ -6,7 +6,13 @@ export const materialRepository = {
     const session = driver.session();
     try {
       const result = await session.run('MATCH (m:Material) RETURN m');
-      return result.records.map(record => record.get('m').properties as Material);
+      return result.records.map(record => {
+        const node = record.get('m');
+        return {
+          ...node.properties,
+          properties: JSON.parse(node.properties.properties)
+        } as Material;
+      });
     } finally {
       await session.close();
     }
@@ -17,11 +23,16 @@ export const materialRepository = {
     try {
       const result = await session.run('MATCH (m:Material {id: $id}) RETURN m', { id });
       if (result.records.length === 0) return undefined;
-      return result.records[0].get('m').properties as Material;
+      const node = result.records[0].get('m');
+      return {
+        ...node.properties,
+        properties: JSON.parse(node.properties.properties)
+      } as Material;
     } finally {
       await session.close();
     }
   },
+
 
   create: async (material: Material): Promise<Material> => {
     const session = driver.session();
@@ -30,7 +41,7 @@ export const materialRepository = {
         id: material.id,
         name: material.name,
         formula: material.formula,
-        properties: material.properties
+        properties: JSON.stringify(material.properties)
       });
       return material;
     } finally {
@@ -43,10 +54,11 @@ export const materialRepository = {
     try {
       const result = await session.run(
         'MATCH (m:Material {id: $id}) SET m.name = $name, m.formula = $formula, m.properties = $properties RETURN m',
-        { id, name: material.name, formula: material.formula, properties: material.properties }
+        { id, name: material.name, formula: material.formula, properties: JSON.stringify(material.properties) }
       );
       if (result.records.length === 0) return undefined;
-      return result.records[0].get('m').properties as Material;
+      const properties = JSON.parse(result.records[0].get('m').properties);
+      return { ...result.records[0].get('m').properties, properties };
     } finally {
       await session.close();
     }
