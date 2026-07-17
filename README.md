@@ -13,9 +13,17 @@ PS: This is free tier deployment. Instance will spin down with inactivity, which
 *   Node.js & Express
 *   Zod (Schema validation)
 *   Jest & Supertest (Testing)
-*   Pino (Logging)
 
-## Development
+## Docker Containerization
+This project includes a `Dockerfile` and `docker-compose.yml` for seamless containerized development.
+
+- **To run the full stack (API + Neo4j):**
+  ```bash
+  docker-compose up
+  ```
+- **Neo4j Access:**
+  - Browser UI: `http://localhost:7474`
+  - Bolt Protocol: `bolt://localhost:7687`
 
 ### Setup
 1. Clone the repo:
