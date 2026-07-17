@@ -2,9 +2,7 @@
 
 A simple REST API for managing material data, built with TypeScript, Express, and Zod for validation.
 
-**Try Live Demo:** You can test the API at [https://material-catalog-api-backend.onrender.com/api-docs](https://material-catalog-api-backend.onrender.com/api-docs)
-
-**Frontend:** Swagger UI
+**Try Live Demo:** [https://material-catalog-api-backend.onrender.com/api-docs](https://material-catalog-api-backend.onrender.com/api-docs)
 
 **Database**: Free instance Neo4j service
 
